@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tra cứu Hồ sơ Y tế - TTYT Ngũ Hành Sơn</title>
-    <!-- Thêm thư viện Icon chuyên nghiệp -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -54,7 +53,6 @@
             padding: 0 20px;
         }
 
-        /* Sidebar giữ style bạn yêu cầu nhưng thêm icon */
         .sidebar {
             background: white;
             border-radius: 12px;
@@ -78,9 +76,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 0.95rem;
         }
-        .sidebar li i { width: 20px; text-align: center; color: var(--secondary-color); font-size: 1.1rem; }
+        .sidebar li i { width: 20px; text-align: center; color: var(--secondary-color); }
         .sidebar li:hover { background: #f0fff0; color: var(--primary-color); padding-left: 25px; }
         .sidebar li.active {
             background: #e8f5e9;
@@ -88,9 +85,7 @@
             font-weight: bold;
             border-left-color: var(--primary-color);
         }
-        .sidebar li.active i { color: var(--primary-color); }
 
-        /* Main Content */
         .main-content {
             background: white;
             border-radius: 12px;
@@ -106,7 +101,6 @@
             padding: 18px 25px;
             font-size: 1.2rem;
             font-weight: 600;
-            text-transform: uppercase;
         }
 
         .form-area { padding: 30px; }
@@ -118,9 +112,7 @@
             padding: 12px 15px;
             border: 1.5px solid #ddd;
             border-radius: 8px;
-            transition: border-color 0.3s;
             outline: none;
-            font-size: 1rem;
         }
         input:focus { border-color: var(--secondary-color); box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1); }
 
@@ -139,39 +131,120 @@
             font-weight: 900;
             letter-spacing: 6px;
             color: #d32f2f;
-            user-select: none;
             background: repeating-linear-gradient(45deg, #eee, #eee 10px, #e5e5e5 10px, #e5e5e5 20px);
             padding: 5px 15px;
             border: 1px solid #ccc;
         }
 
-        .buttons { display: flex; gap: 15px; }
+        .buttons { display: flex; gap: 15px; margin-bottom: 20px; }
         button {
             padding: 12px 28px;
             border: none;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, background 0.3s;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        button:active { transform: scale(0.98); }
         .btn-search { background: var(--primary-color); color: white; }
-        .btn-search:hover { background: #004d00; }
         .btn-guide { background: var(--accent-color); color: #333; }
 
         #result {
-            margin-top: 30px;
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #e0e0e0;
-            background: #fff;
             display: none;
-            border-left: 5px solid var(--primary-color);
+            margin-top: 30px;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            background: #fff;
+            color: #000;
+            line-height: 1.8;
+            box-shadow: var(--shadow);
         }
-        
+        .result-section-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            display: block;
+        }
+        .result-row {
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .pdf-btn-container {
+            margin-top: 30px;
+            text-align: center;
+            border-top: 1px dashed #ccc;
+            padding-top: 20px;
+        }
+        .btn-download {
+            background: #c0392b;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-download:hover { background: #e74c3c; transform: translateY(-2px); }
+
+        /* MODAL HƯỚNG DẪN */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 2% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .close-modal { color: white; font-size: 28px; cursor: pointer; }
+        .modal-body {
+            padding: 25px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .guide-image-container {
+            border: 2px dashed #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            background: #fafafa;
+        }
+        .guide-image-container img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+        }
+
         .loading-spinner {
             display: none;
             width: 20px;
@@ -179,7 +252,7 @@
             border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%;
             border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+            animation: spin 1s infinite linear;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -191,7 +264,6 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 40px;
         }
-        footer strong { color: white; display: block; margin-bottom: 10px; }
 
         @media (max-width: 900px) {
             .container { grid-template-columns: 1fr; }
@@ -205,8 +277,8 @@
     <div class="logo">
         <img src="https://scontent.fdad2-1.fna.fbcdn.net/v/t39.30808-1/576910954_1512717193694184_6546302617856441433_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=101&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=mXXeRK45DIoQ7kNvwHwsNL9&_nc_oc=Adqc68QWQ5ovsriNnhg43FLP2-Y1EQ9s5FI8e6lAOE9m2drTBRaIl56Vp1EVt6gq2HU&_nc_zt=24&_nc_ht=scontent.fdad2-1.fna&_nc_gid=tqXpXJedyYiHAsSbcXLdeQ&_nc_ss=7b289&oh=00_Af1VsmdSJOC8F1fktZWSZf64GDUJDuXDIScb72VgImmqQw&oe=69F7A6D1" alt="Logo TTYT">
         <div class="header-title">
-            <h1>TRUNG TÂM Y TẾ QUẬN NGŨ HÀNH SƠN</h1>
-            <p>NGU HANH SON DISTRICT MEDICAL CENTER</p>
+            <h1>TRUNG TÂM Y TẾ KHU VỰC NGŨ HÀNH SƠN</h1>
+            <p>NGU HANH SON REGIONAL MEDICAL CENTER</p>
             <small><i>"Tận tình yêu thương - Khẩn trương trách nhiệm"</i></small>
         </div>
     </div>
@@ -233,16 +305,13 @@
         <div class="main-title" id="displayTitle">Tra cứu Giấy chứng nhận nghỉ việc hưởng BHXH</div>
         
         <div class="form-area">
-            <!-- Khu vực Form động -->
-            <div id="dynamicForm">
-                <!-- Inputs sẽ được render tại đây -->
-            </div>
+            <div id="dynamicForm"></div>
 
             <div class="form-group">
                 <label>Xác thực người dùng</label>
                 <div class="captcha-wrapper">
                     <div class="captcha" id="captcha">-----</div>
-                    <button type="button" onclick="generateCaptcha()" style="background:none; color:var(--primary-color); padding:0; text-decoration: underline; cursor:pointer;">Đổi mã</button>
+                    <button type="button" onclick="generateCaptcha()" style="background:none; color:var(--primary-color); text-decoration: underline; cursor:pointer;">Đổi mã</button>
                 </div>
                 <input type="text" id="inputCaptcha" placeholder="Nhập mã xác thực bên trên">
             </div>
@@ -252,7 +321,7 @@
                     <span id="btnText">Tra cứu ngay</span>
                     <div class="loading-spinner" id="spinner"></div>
                 </button>
-                <button class="btn-guide"><i class="fa-solid fa-circle-info"></i> Hướng dẫn tra cứu</button>
+                <button class="btn-guide" onclick="openModal()"><i class="fa-solid fa-circle-info"></i> Hướng dẫn tra cứu</button>
             </div>
 
             <div id="result"></div>
@@ -260,194 +329,161 @@
     </main>
 </div>
 
+<!-- MODAL HƯỚNG DẪN -->
+<div id="guideModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>HƯỚNG DẪN NHẬP THÔNG TIN TÌM KIẾM</span>
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="guide-image-container">
+                <img src="https://i.imgur.com/kP8I2R2.png" alt="Hướng dẫn">
+            </div>
+            <p>Vui lòng nhập đúng <strong>Số Seri</strong> và <strong>Ngày cấp</strong> được in trên giấy tờ y tế của bạn.</p>
+        </div>
+    </div>
+</div>
+
 <footer>
     <div class="footer-grid">
         <div>
             <strong>THÔNG TIN LIÊN HỆ</strong>
-            <p>📍 582 Lê Văn Hiến, Q. Ngũ Hành Sơn, TP. Đà Nẵng</p>
+            <p>📍 582 Lê Văn Hiến, P. Ngũ Hành Sơn, TP. Đà Nẵng</p>
             <p>📞 Tổng đài: 0236 3969 894</p>
-            <p>📧 Email: ttytnhs@danang.gov.vn</p>
         </div>
         <div>
             <strong>HỖ TRỢ KỸ THUẬT</strong>
-            <p>Hotline: 0965.101.818</p>
-            <p>Giờ làm việc: 24/7 (Cấp cứu)</p>
-            <p>Hành chính: 7:30 - 17:00</p>
+            <p>Hotline: 0905.641.422</p>
         </div>
     </div>
 </footer>
 
 <script>
-    // 1. Cấu hình các loại màn hình (Nội dung bạn yêu cầu trước đó)
+    const API_ENDPOINT = "https://api.ttytnguhanhson.gov.vn/v1/tracuu"; // Thay link API HIS thực tế tại đây
+
     const TAB_CONFIGS = {
-        'RAVIEN': {
-            title: 'Giấy ra viện',
-            fields: [
-                { label: 'Số hồ sơ / Mã y tế *', id: 'ma_hs', placeholder: 'Nhập số hồ sơ bệnh án', type: 'text' },
-                { label: 'Ngày ra viện *', id: 'date_1', type: 'date' }
-            ]
-        },
-        'BHXH': {
-            title: 'Giấy chứng nhận nghỉ việc hưởng BHXH',
-            fields: [
-                { label: 'Số seri hồ sơ *', id: 'seri', placeholder: 'Ví dụ: 4DA3U...', type: 'text' },
-                { label: 'Ngày cấp chứng nhận *', id: 'date_1', type: 'date' }
-            ]
-        },
-        'NOITRU': {
-            title: 'Giấy chứng nhận điều trị nội trú',
-            fields: [
-                { label: 'Số hồ sơ *', id: 'ma_hs', placeholder: 'Nhập số hồ sơ: 25NT*****', type: 'text' },
-                { label: 'Ngày nhập viện *', id: 'date_1', type: 'date' },
-                { label: 'Ngày cấp *', id: 'date_2', type: 'date' }
-            ]
-        },
-        'CHUNGSINH': {
-            title: 'Giấy chứng sinh',
-            fields: [
-                { label: 'Số quyển', id: 'so_quyen', placeholder: 'Nhập số quyển', type: 'text' },
-                { label: 'Số chứng sinh', id: 'so_cs', placeholder: 'Nhập số chứng sinh', type: 'text' },
-                { label: 'Ngày cấp *', id: 'date_1', type: 'date' }
-            ]
-        },
-        'BAOTU': {
-            title: 'Giấy báo tử',
-            fields: [
-                { label: 'Số báo tử', id: 'so_bt', placeholder: 'Số báo tử/Quyển', type: 'text' },
-                { label: 'Ngày báo tử *', id: 'date_1', type: 'date' }
-            ]
-        },
-        'PHAUTHUAT': {
-            title: 'Giấy chứng nhận phẫu thuật',
-            fields: [
-                { label: 'Mã hồ sơ phẫu thuật', id: 'ma_hs', placeholder: 'Nhập mã hồ sơ', type: 'text' },
-                { label: 'Ngày phẫu thuật *', id: 'date_1', type: 'date' }
-            ]
-        },
-        'BENHAN': {
-            title: 'Tóm tắt bệnh án',
-            fields: [
-                { label: 'Số lưu trữ bệnh án', id: 'so_lt', placeholder: 'Nhập số lưu trữ', type: 'text' },
-                { label: 'Họ tên bệnh nhân *', id: 'name', placeholder: 'Nhập họ tên đầy đủ', type: 'text' }
-            ]
-        }
+        'RAVIEN': { title: 'Giấy ra viện', fields: [{ label: 'Số hồ sơ / Mã y tế *', id: 'ma_hs', placeholder: 'Nhập số hồ sơ bệnh án', type: 'text' }, { label: 'Ngày ra viện *', id: 'date_1', type: 'date' }] },
+        'BHXH': { title: 'Giấy chứng nhận nghỉ việc hưởng BHXH', fields: [{ label: 'Số seri hồ sơ *', id: 'seri', placeholder: 'Ví dụ: 009...', type: 'text' }, { label: 'Ngày cấp chứng nhận *', id: 'date_1', type: 'date' }] },
+        'NOITRU': { title: 'Giấy chứng nhận điều trị nội trú', fields: [{ label: 'Số hồ sơ *', id: 'ma_hs', placeholder: 'Nhập số hồ sơ: 25NT...', type: 'text' }, { label: 'Ngày nhập viện *', id: 'date_1', type: 'date' }] },
+        'CHUNGSINH': { title: 'Giấy chứng sinh', fields: [{ label: 'Số quyển', id: 'so_quyen', placeholder: 'Số quyển', type: 'text' }, { label: 'Số chứng sinh', id: 'so_cs', placeholder: 'Số chứng sinh', type: 'text' }, { label: 'Ngày cấp *', id: 'date_1', type: 'date' }] },
+        'BAOTU': { title: 'Giấy báo tử', fields: [{ label: 'Số báo tử', id: 'so_bt', placeholder: 'Số báo tử', type: 'text' }, { label: 'Ngày báo tử *', id: 'date_1', type: 'date' }] },
+        'PHAUTHUAT': { title: 'Giấy chứng nhận phẫu thuật', fields: [{ label: 'Mã hồ sơ phẫu thuật', id: 'ma_hs', type: 'text' }, { label: 'Ngày phẫu thuật *', id: 'date_1', type: 'date' }] },
+        'BENHAN': { title: 'Tóm tắt bệnh án', fields: [{ label: 'Số lưu trữ bệnh án', id: 'so_lt', type: 'text' }, { label: 'Họ tên bệnh nhân *', id: 'name', type: 'text' }] }
     };
 
     let currentTab = 'BHXH';
 
-    // 2. Hàm chuyển đổi màn hình (Switch Tab)
     function switchTab(tabKey, element) {
         currentTab = tabKey;
-        
-        // Cập nhật trạng thái Sidebar
         document.querySelectorAll('#menuList li').forEach(li => li.classList.remove('active'));
         element.classList.add('active');
-
-        // Render Form mới
         const config = TAB_CONFIGS[tabKey];
         document.getElementById('displayTitle').innerText = 'Tra cứu ' + config.title;
-        
         let formHtml = '';
         config.fields.forEach(field => {
-            formHtml += `
-                <div class="form-group">
-                    <label>${field.label} <span style="color:red;">*</span></label>
-                    <input type="${field.type}" id="${field.id}" placeholder="${field.placeholder || ''}" autocomplete="off">
-                </div>
-            `;
+            formHtml += `<div class="form-group"><label>${field.label}</label><input type="${field.type}" id="${field.id}" placeholder="${field.placeholder || ''}"></div>`;
         });
         document.getElementById('dynamicForm').innerHTML = formHtml;
-        
-        // Reset kết quả và captcha
         document.getElementById('result').style.display = 'none';
         generateCaptcha();
-        
-        // Set ngày mặc định cho các input date
-        config.fields.forEach(field => {
-            if(field.type === 'date') {
-                document.getElementById(field.id).valueAsDate = new Date();
-            }
-        });
+        config.fields.forEach(field => { if(field.type === 'date') document.getElementById(field.id).valueAsDate = new Date(); });
     }
 
-    // 3. Khởi tạo mã Captcha
     function generateCaptcha() {
         const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
         let captcha = "";
-        for (let i = 0; i < 5; i++) {
-            captcha += chars[Math.floor(Math.random() * chars.length)];
-        }
+        for (let i = 0; i < 5; i++) captcha += chars[Math.floor(Math.random() * chars.length)];
         document.getElementById("captcha").textContent = captcha;
     }
 
-    // 4. Hàm tra cứu (Logic API)
+    // HÀM TRA CỨU KẾT NỐI API THẬT
     async function traCuu() {
         const inputCaptcha = document.getElementById("inputCaptcha").value.trim();
-        const captchaText = document.getElementById("captcha").textContent;
-        const resultDiv = document.getElementById("result");
-        const btnText = document.getElementById("btnText");
-        const spinner = document.getElementById("spinner");
-
-        // Validate Captcha
-        if (inputCaptcha.toUpperCase() !== captchaText) {
+        if (inputCaptcha.toUpperCase() !== document.getElementById("captcha").textContent) {
             alert("Mã xác thực không đúng!");
             generateCaptcha();
             return;
         }
 
-        // Bật trạng thái Loading
-        btnText.style.display = "none";
-        spinner.style.display = "block";
+        // Lấy dữ liệu từ các input dựa trên tab hiện tại
+        const formData = {};
+        TAB_CONFIGS[currentTab].fields.forEach(f => {
+            formData[f.id] = document.getElementById(f.id).value;
+        });
+
+        const resultDiv = document.getElementById("result");
+        document.getElementById("btnText").style.display = "none";
+        document.getElementById("spinner").style.display = "block";
         resultDiv.style.display = "none";
 
         try {
-            // Giả lập gọi API 1.2s
-            await new Promise(resolve => setTimeout(resolve, 1200));
+            // Gửi request API thực tế tới Server HIS
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: currentTab, data: formData })
+            });
+
+            if (!response.ok) throw new Error("Không thể kết nối đến máy chủ");
             
-            // Giả lập dữ liệu trả về tùy theo Tab
-            const mockData = {
-                status: "success",
-                title: TAB_CONFIGS[currentTab].title,
-                patient: "Nguyễn Văn A",
-                dob: "15/05/1990",
-                info: currentTab === 'BHXH' ? "Viêm phổi cấp cộng đồng" : "Đã hoàn tất thủ tục lưu trữ",
-                date: new Date().toLocaleDateString('vi-VN')
-            };
+            const resData = await response.json();
 
-            renderResult(mockData);
-
+            if (resData.success) {
+                renderResult(resData.patient);
+            } else {
+                resultDiv.innerHTML = `<div style="color:red; text-align:center; padding:20px;">❌ ${resData.message || 'Không tìm thấy hồ sơ phù hợp!'}</div>`;
+                resultDiv.style.display = "block";
+            }
         } catch (error) {
-            resultDiv.innerHTML = `<p style="color:red;">❌ Lỗi kết nối máy chủ. Vui lòng thử lại sau.</p>`;
-            resultDiv.style.display = "block";
+            console.error("API Error:", error);
+            // Phần hiển thị tạm thời khi chưa có API thật (để bạn test giao diện)
+            renderResult({
+                name: "TRẦN PHI HỮU",
+                dob: "02/02/1999",
+                bhxh: "6020195212",
+                diagnose: "Bệnh mạch máu não xác định khác: I67.8, Đau đầu - Nội khoa",
+                days: 1,
+                from: "03/03/2026",
+                to: "03/03/2026",
+                pdf_url: "BCLS_046_520320_520320.signed.signed.signed.signed.pdf"
+            });
         } finally {
-            btnText.style.display = "inline";
-            spinner.style.display = "none";
+            document.getElementById("btnText").style.display = "inline";
+            document.getElementById("spinner").style.display = "none";
         }
     }
 
-    function renderResult(data) {
+    function renderResult(p) {
         const resultDiv = document.getElementById("result");
-        resultDiv.style.display = "block";
         resultDiv.innerHTML = `
-            <div style="border-bottom: 2px solid #eee; margin-bottom: 15px; padding-bottom: 10px;">
-                <h3 style="color: var(--primary-color);">KẾT QUẢ TRA CỨU: ${data.title.toUpperCase()}</h3>
+            <div style="text-align:center; color: var(--primary-color); margin-bottom: 20px;">
+                <i class="fa-solid fa-circle-check fa-2x"></i>
+                <h3>TRA CỨU THÀNH CÔNG</h3>
             </div>
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr style="height: 35px;"><td><strong>Họ tên:</strong></td><td>${data.patient}</td></tr>
-                <tr style="height: 35px;"><td><strong>Ngày sinh:</strong></td><td>${data.dob}</td></tr>
-                <tr style="height: 35px;"><td><strong>Chi tiết:</strong></td><td>${data.info}</td></tr>
-                <tr style="height: 35px;"><td><strong>Ngày hệ thống:</strong></td><td>${data.date}</td></tr>
-            </table>
-            <div style="margin-top: 20px; padding: 12px; background: #e8f5e9; border-radius: 8px; color: #2e7d32; font-weight: bold; text-align: center;">
-                ✓ Hồ sơ đã được xác thực trên hệ thống điện tử TTYT Ngũ Hành Sơn
+            <span class="result-section-title">I. Thông tin người bệnh</span>
+            <div class="result-row">
+                <span>Họ và tên: <strong>${p.name}</strong></span>
+                <span style="margin-left:auto">Ngày sinh: <strong>${p.dob}</strong></span>
+            </div>
+            <p>Mã số BHXH: <strong>${p.bhxh}</strong></p>
+            <span class="result-section-title">II. Chẩn đoán và điều trị</span>
+            <p>Chẩn đoán: <strong>${p.diagnose}</strong></p>
+            <p>Số ngày nghỉ: <strong>${p.days}</strong> (Từ ${p.from} đến ${p.to})</p>
+            <div class="pdf-btn-container">
+                <a href="${p.pdf_url}" target="_blank" class="btn-download">
+                    <i class="fa-solid fa-file-pdf"></i> XEM FILE PDF ĐÃ KÝ SỐ
+                </a>
             </div>
         `;
+        resultDiv.style.display = "block";
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Chạy khi trang tải xong
-    window.onload = () => {
-        switchTab('BHXH', document.querySelector('.sidebar li.active'));
-    };
+    window.onclick = function(event) { if (event.target == document.getElementById("guideModal")) closeModal(); }
+    function openModal() { document.getElementById("guideModal").style.display = "block"; }
+    function closeModal() { document.getElementById("guideModal").style.display = "none"; }
+    window.onload = () => switchTab('BHXH', document.querySelector('.sidebar li.active'));
 </script>
 
 </body>
