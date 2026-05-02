@@ -13,6 +13,7 @@
             --bg-body: #f0f2f5;
             --text-dark: #2d3436;
             --shadow: 0 4px 15px rgba(0,0,0,0.1);
+            --zalo-color: #0068ff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -150,6 +151,18 @@
         .btn-search { background: var(--primary-color); color: white; }
         .btn-guide { background: var(--accent-color); color: #333; }
 
+        /* Zalo Verify Box */
+        #zaloVerifyBox {
+            display: none;
+            background: #eef5ff;
+            border: 1px solid #cce0ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            animation: slideDown 0.4s ease;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
         #result {
             display: none;
             margin-top: 30px;
@@ -232,18 +245,6 @@
             max-height: 80vh;
             overflow-y: auto;
         }
-        .guide-image-container {
-            border: 2px dashed #ccc;
-            padding: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            background: #fafafa;
-        }
-        .guide-image-container img {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #ddd;
-        }
 
         .loading-spinner {
             display: none;
@@ -257,14 +258,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         footer { background: #1a1a1a; color: #bbb; padding: 40px 5%; margin-top: 50px; }
-        .footer-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
-
+        
         @media (max-width: 900px) {
             .container { grid-template-columns: 1fr; }
             header { flex-direction: column; text-align: center; gap: 20px; }
@@ -289,7 +283,7 @@
 
 <div class="container">
     <aside class="sidebar">
-        <h3>Danh mục cần tra cứu</h3>
+        <h3>Danh mục dịch vụ</h3>
         <ul id="menuList">
             <li onclick="switchTab('RAVIEN', this)"><i class="fa-solid fa-house-medical-circle-check"></i> Giấy ra viện</li>
             <li class="active" onclick="switchTab('BHXH', this)"><i class="fa-solid fa-id-card-clip"></i> Giấy nghỉ hưởng BHXH</li>
@@ -317,11 +311,22 @@
             </div>
 
             <div class="buttons">
-                <button class="btn-search" onclick="traCuu()">
+                <button class="btn-search" id="mainSearchBtn" onclick="traCuu()">
                     <span id="btnText">Tra cứu ngay</span>
                     <div class="loading-spinner" id="spinner"></div>
                 </button>
                 <button class="btn-guide" onclick="openModal()"><i class="fa-solid fa-circle-info"></i> Hướng dẫn tra cứu</button>
+            </div>
+
+            <!-- Vùng xác thực Zalo -->
+            <div id="zaloVerifyBox">
+                <h4 style="color: var(--zalo-color); margin-bottom: 10px;"><i class="fa-brands fa-zalo"></i> Bước cuối: Xác nhận danh tính</h4>
+                <p style="font-size: 0.9rem; margin-bottom: 15px;">Hệ thống đã gửi mã OTP đến Zalo số điện thoại <strong><span id="maskedPhone">*******422</span></strong>. Vui lòng kiểm tra và nhập mã để xem hồ sơ.</p>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="zaloOtpInput" placeholder="Nhập mã OTP 6 số" maxlength="6">
+                    <button onclick="confirmOtp()" style="background: var(--zalo-color); color:white; white-space: nowrap;">Xác nhận OTP</button>
+                </div>
+                <p id="otpTimer" style="font-size: 0.8rem; margin-top:10px; color: #666;">Mã hiệu lực trong: <span id="timerSec">60</span>s</p>
             </div>
 
             <div id="result"></div>
@@ -329,7 +334,6 @@
     </main>
 </div>
 
-<!-- MODAL HƯỚNG DẪN -->
 <div id="guideModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -337,30 +341,29 @@
             <span class="close-modal" onclick="closeModal()">&times;</span>
         </div>
         <div class="modal-body">
-            <div class="guide-image-container">
-                <img src="https://i.imgur.com/kP8I2R2.png" alt="Hướng dẫn">
-            </div>
             <p>Vui lòng nhập đúng <strong>Số Seri</strong> và <strong>Ngày cấp</strong> được in trên giấy tờ y tế của bạn.</p>
         </div>
     </div>
 </div>
 
 <footer>
-    <div class="footer-grid">
-        <div>
-            <strong>THÔNG TIN LIÊN HỆ</strong>
-            <p>📍 582 Lê Văn Hiến, P. Ngũ Hành Sơn, TP. Đà Nẵng</p>
-            <p>📞 Tổng đài: 0236 3969 894</p>
-        </div>
-        <div>
-            <strong>HỖ TRỢ KỸ THUẬT</strong>
-            <p>Hotline: 0905.641.422</p>
-        </div>
+    <div style="text-align:center; opacity: 0.7; font-size: 0.9rem;">
+        <p>© 2026 Trung tâm Y tế Ngũ Hành Sơn - Hệ thống bảo mật 2 lớp qua Zalo Official Account</p>
     </div>
 </footer>
 
 <script>
-    const API_ENDPOINT = "https://api.ttytnguhanhson.gov.vn/v1/tracuu"; // Thay link API HIS thực tế tại đây
+    // CẤU TRÚC API ĐỀ XUẤT CHO IT BỆNH VIỆN
+    /*
+        POST /v1/tracuu
+        Body {
+            "action": "INIT_SEARCH" | "CONFIRM_OTP" | "SECURITY_ALERT",
+            "type": "BHXH",
+            "data": { ...form data... },
+            "otp": "123456" (chỉ gửi khi action=CONFIRM_OTP)
+        }
+    */
+    const API_ENDPOINT = "https://api.ttytnguhanhson.gov.vn/v1/tracuu"; 
 
     const TAB_CONFIGS = {
         'RAVIEN': { title: 'Giấy ra viện', fields: [{ label: 'Số hồ sơ / Mã y tế *', id: 'ma_hs', placeholder: 'Nhập số hồ sơ bệnh án', type: 'text' }, { label: 'Ngày ra viện *', id: 'date_1', type: 'date' }] },
@@ -373,6 +376,7 @@
     };
 
     let currentTab = 'BHXH';
+    let sessionData = null; // Lưu tạm dữ liệu form để dùng sau khi xác thực OTP thành công
 
     function switchTab(tabKey, element) {
         currentTab = tabKey;
@@ -386,8 +390,8 @@
         });
         document.getElementById('dynamicForm').innerHTML = formHtml;
         document.getElementById('result').style.display = 'none';
+        document.getElementById('zaloVerifyBox').style.display = 'none';
         generateCaptcha();
-        config.fields.forEach(field => { if(field.type === 'date') document.getElementById(field.id).valueAsDate = new Date(); });
     }
 
     function generateCaptcha() {
@@ -397,7 +401,7 @@
         document.getElementById("captcha").textContent = captcha;
     }
 
-    // HÀM TRA CỨU KẾT NỐI API THẬT
+    // BƯỚC 1: TRA CỨU BAN ĐẦU & KÍCH HOẠT ZALO
     async function traCuu() {
         const inputCaptcha = document.getElementById("inputCaptcha").value.trim();
         if (inputCaptcha.toUpperCase() !== document.getElementById("captcha").textContent) {
@@ -406,51 +410,103 @@
             return;
         }
 
-        // Lấy dữ liệu từ các input dựa trên tab hiện tại
         const formData = {};
         TAB_CONFIGS[currentTab].fields.forEach(f => {
             formData[f.id] = document.getElementById(f.id).value;
         });
+        sessionData = formData; // Lưu lại để dùng cho bước sau
 
-        const resultDiv = document.getElementById("result");
         document.getElementById("btnText").style.display = "none";
         document.getElementById("spinner").style.display = "block";
-        resultDiv.style.display = "none";
 
         try {
-            // Gửi request API thực tế tới Server HIS
             const response = await fetch(API_ENDPOINT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: currentTab, data: formData })
+                body: JSON.stringify({ 
+                    action: "INIT_SEARCH", 
+                    type: currentTab, 
+                    data: formData 
+                })
             });
 
-            if (!response.ok) throw new Error("Không thể kết nối đến máy chủ");
-            
+            const resData = await response.json();
+
+            if (resData.success) {
+                // Hiển thị vùng nhập OTP
+                document.getElementById('maskedPhone').innerText = resData.maskedPhone || "*******422";
+                document.getElementById('zaloVerifyBox').style.display = 'block';
+                document.getElementById('mainSearchBtn').disabled = true;
+                startTimer();
+            } else {
+                alert(resData.message || "Không tìm thấy hồ sơ phù hợp!");
+            }
+        } catch (error) {
+            // MÔ PHỎNG KHI CHƯA CÓ BACKEND THẬT
+            console.warn("Chế độ Demo: Đang gửi OTP giả lập tới Zalo bệnh nhân...");
+            document.getElementById('zaloVerifyBox').style.display = 'block';
+            document.getElementById('mainSearchBtn').disabled = true;
+            startTimer();
+        } finally {
+            document.getElementById("btnText").style.display = "inline";
+            document.getElementById("spinner").style.display = "none";
+        }
+    }
+
+    // BƯỚC 2: XÁC NHẬN OTP & CẢNH BÁO BẢO MẬT
+    let retryCount = 0;
+    async function confirmOtp() {
+        const otp = document.getElementById("zaloOtpInput").value;
+        if(otp.length < 6) return alert("Vui lòng nhập đủ 6 số!");
+
+        try {
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    action: "CONFIRM_OTP", 
+                    type: currentTab, 
+                    data: sessionData,
+                    otp: otp
+                })
+            });
+
             const resData = await response.json();
 
             if (resData.success) {
                 renderResult(resData.patient);
+                document.getElementById('zaloVerifyBox').style.display = 'none';
             } else {
-                resultDiv.innerHTML = `<div style="color:red; text-align:center; padding:20px;">❌ ${resData.message || 'Không tìm thấy hồ sơ phù hợp!'}</div>`;
-                resultDiv.style.display = "block";
+                retryCount++;
+                if(retryCount >= 3) {
+                    // CẢNH BÁO TRUY CẬP TRÁI PHÉP
+                    fetch(API_ENDPOINT, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: "SECURITY_ALERT", data: sessionData })
+                    });
+                    alert("CẢNH BÁO: Bạn nhập sai quá nhiều lần. Một thông báo truy cập trái phép đã được gửi tới Zalo chính chủ!");
+                } else {
+                    alert("Mã OTP không chính xác. Vui lòng kiểm tra lại tin nhắn Zalo!");
+                }
             }
         } catch (error) {
-            console.error("API Error:", error);
-            // Phần hiển thị tạm thời khi chưa có API thật (để bạn test giao diện)
-            renderResult({
-                name: "TRẦN PHI HỮU",
-                dob: "02/02/1999",
-                bhxh: "6020195212",
-                diagnose: "Bệnh mạch máu não xác định khác: I67.8, Đau đầu - Nội khoa",
-                days: 1,
-                from: "03/03/2026",
-                to: "03/03/2026",
-                pdf_url: "BCLS_046_520320_520320.signed.signed.signed.signed.pdf"
-            });
-        } finally {
-            document.getElementById("btnText").style.display = "inline";
-            document.getElementById("spinner").style.display = "none";
+            // Demo thành công với mã 123456
+            if(otp === "123456") {
+                renderResult({
+                    name: "TRẦN PHI HỮU",
+                    dob: "02/02/1999",
+                    bhxh: "6020195212",
+                    diagnose: "Bệnh mạch máu não xác định khác: I67.8, Đau đầu - Nội khoa",
+                    days: 1,
+                    from: "03/03/2026",
+                    to: "03/03/2026",
+                    pdf_url: "#"
+                });
+                document.getElementById('zaloVerifyBox').style.display = 'none';
+            } else {
+                alert("Mã demo là 123456");
+            }
         }
     }
 
@@ -480,11 +536,22 @@
         resultDiv.scrollIntoView({ behavior: 'smooth' });
     }
 
-    window.onclick = function(event) { if (event.target == document.getElementById("guideModal")) closeModal(); }
+    function startTimer() {
+        let sec = 60;
+        const timer = setInterval(() => {
+            sec--;
+            document.getElementById('timerSec').innerText = sec;
+            if(sec <= 0) {
+                clearInterval(timer);
+                document.getElementById('mainSearchBtn').disabled = false;
+                alert("Mã OTP đã hết hạn, vui lòng tra cứu lại!");
+            }
+        }, 1000);
+    }
+
     function openModal() { document.getElementById("guideModal").style.display = "block"; }
     function closeModal() { document.getElementById("guideModal").style.display = "none"; }
     window.onload = () => switchTab('BHXH', document.querySelector('.sidebar li.active'));
 </script>
-
 </body>
 </html>
