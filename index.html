@@ -309,7 +309,7 @@
             <div id="dynamicForm"></div>
 
             <div class="form-group">
-                <label>Xác thực chống máy (Captcha)</label>
+                <label>Nhập mã xác thực (Captcha)</label>
                 <div class="captcha-wrapper">
                     <div class="captcha" id="captcha">-----</div>
                     <button type="button" onclick="generateCaptcha()" style="background:none; color:var(--primary-color); text-decoration: underline; cursor:pointer;">Đổi mã</button>
@@ -348,7 +348,7 @@
             <span class="close-modal" onclick="closeModal()">&times;</span>
         </div>
         <div class="modal-body">
-            <p>Vui lòng nhập đúng <strong>Số Seri</strong> và <strong>Ngày cấp</strong> được in trên giấy tờ y tế của bạn.</p>
+            <p>Vui lòng nhập đúng <strong>Số Seri</strong> được in trên giấy tờ y tế của bạn.</p>
         </div>
     </div>
 </div>
@@ -375,14 +375,14 @@
     const API_ENDPOINT = "https://api.ttytnguhanhson.gov.vn/v1/tracuu"; 
 
     const TAB_CONFIGS = {
-        'RAVIEN': { title: 'Giấy ra viện', fields: [{ label: 'Số hồ sơ / Mã y tế *', id: 'ma_hs', placeholder: 'Nhập số hồ sơ bệnh án', type: 'text' }, { label: 'Ngày ra viện *', id: 'date_1', type: 'date' }] },
-        'BHXH': { title: 'Giấy chứng nhận nghỉ việc hưởng BHXH', fields: [{ label: 'Số seri hồ sơ *', id: 'seri', placeholder: 'Ví dụ: 009...', type: 'text' }, { label: 'Ngày cấp chứng nhận *', id: 'date_1', type: 'date' }] },
-        'NOITRU': { title: 'Giấy chứng nhận điều trị nội trú', fields: [{ label: 'Số hồ sơ *', id: 'ma_hs', placeholder: 'Nhập số hồ sơ: 25NT...', type: 'text' }, { label: 'Ngày nhập viện *', id: 'date_1', type: 'date' }] },
-        'CHUNGSINH': { title: 'Giấy chứng sinh', fields: [{ label: 'Số quyển', id: 'so_quyen', placeholder: 'Số quyển', type: 'text' }, { label: 'Số chứng sinh', id: 'so_cs', placeholder: 'Số chứng sinh', type: 'text' }, { label: 'Ngày cấp *', id: 'date_1', type: 'date' }] },
-        'BAOTU': { title: 'Giấy báo tử', fields: [{ label: 'Số báo tử', id: 'so_bt', placeholder: 'Số báo tử', type: 'text' }, { label: 'Ngày báo tử *', id: 'date_1', type: 'date' }] },
-        'PHAUTHUAT': { title: 'Giấy chứng nhận phẫu thuật', fields: [{ label: 'Mã hồ sơ phẫu thuật', id: 'ma_hs', type: 'text' }, { label: 'Ngày phẫu thuật *', id: 'date_1', type: 'date' }] },
-        'BENHAN': { title: 'Tóm tắt bệnh án', fields: [{ label: 'Số lưu trữ bệnh án', id: 'so_lt', type: 'text' }, { label: 'Họ tên bệnh nhân *', id: 'name', type: 'text' }] }
-    };
+    'RAVIEN': { action: 'HSRAVIEN', title: 'Giấy ra viện', fields: [{ label: 'Số hồ sơ / Mã y tế *', id: 'ma_hs', placeholder: 'Nhập số hồ sơ bệnh án', type: 'text' }, { label: 'Ngày ra viện *', id: 'date_1', type: 'date' }] },
+    'BHXH': { action: 'HSCHUNGTU_CT07', title: 'Giấy chứng nhận nghỉ việc hưởng BHXH', fields: [{ label: 'Số seri hồ sơ *', id: 'seri', placeholder: 'Ví dụ: 26.01621', type: 'text' }] },
+    'NOITRU': { action: 'HSDIEUTRINOITRU', title: 'Giấy điều trị nội trú', fields: [{ label: 'Số hồ sơ *', id: 'ma_hs', placeholder: 'Nhập số hồ sơ: 25NT...', type: 'text' }, { label: 'Ngày nhập viện *', id: 'date_1', type: 'date' }] },
+    'CHUNGSINH': { action: 'HSCHUNGSINH', title: 'Giấy chứng sinh', fields: [{ label: 'Số chứng sinh *', id: 'so_cs', placeholder: 'Nhập số chứng sinh', type: 'text' }] },
+    'BAOTU': { action: 'HSBAOTU', title: 'Giấy báo tử', fields: [{ label: 'Số báo tử *', id: 'so_bt', placeholder: 'Nhập số báo tử', type: 'text' }] },
+    'PHAUTHUAT': { action: 'HSPHAUTHUAT', title: 'Giấy chứng nhận phẫu thuật', fields: [{ label: 'Mã hồ sơ phẫu thuật *', id: 'ma_hs', type: 'text' }] },
+    'BENHAN': { action: 'HSTOMTATBENHAN', title: 'Tóm tắt bệnh án', fields: [{ label: 'Số lưu trữ bệnh án *', id: 'so_lt', type: 'text' }] }
+};
 
     let currentTab = 'BHXH';
     let failedAttempts = 0;
@@ -412,44 +412,75 @@
     }
 
     // BƯỚC 1: TRA CỨU & GỬI OTP ZALO
-    async function traCuuStep1() {
-        const inputCaptcha = document.getElementById("inputCaptcha").value.trim();
-        if (inputCaptcha.toUpperCase() !== document.getElementById("captcha").textContent) {
-            alert("Mã Captcha không đúng!");
-            return;
-        }
+    // 1. Định nghĩa hàm maskPhone để sửa lỗi ReferenceError
+function maskPhone(phone) {
+    if (!phone || phone.length < 10) return "*******422";
+    // Hiển thị 4 số đầu và 3 số cuối, ở giữa là dấu *
+    return phone.substring(0, 4) + "***" + phone.substring(phone.length - 3);
+}
 
-        const formData = {};
-        TAB_CONFIGS[currentTab].fields.forEach(f => formData[f.id] = document.getElementById(f.id).value);
-        savedFormData = formData;
+// 2. Hàm traCuuStep1 hoàn thiện
+async function traCuuStep1() {
+    // 1. Kiểm tra Captcha
+    const inputCaptcha = document.getElementById("inputCaptcha");
+    const captchaText = document.getElementById("captcha");
+    if (inputCaptcha.value.trim().toUpperCase() !== captchaText.textContent) {
+        alert("Mã Captcha không đúng!");
+        generateCaptcha();
+        return;
+    }
 
-        document.getElementById("btnText").style.display = "none";
-        document.getElementById("spinner").style.display = "block";
+    // 2. Lấy cấu hình của Tab hiện tại và giá trị người dùng nhập
+    const config = TAB_CONFIGS[currentTab];
+    const firstFieldId = config.fields[0].id; // Lấy ID của trường nhập liệu đầu tiên (seri, ma_hs, so_cs...)
+    const paramValue = document.getElementById(firstFieldId).value.trim();
 
-        try {
-            const response = await fetch(API_ENDPOINT, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'INIT', type: currentTab, data: formData })
-            });
-            const res = await response.json();
+    if (!paramValue) {
+        alert(`Vui lòng nhập ${config.fields[0].label}`);
+        return;
+    }
 
-            if (res.success) {
-                document.getElementById('maskedPhone').innerText = res.maskedPhone || "*******422";
-                document.getElementById('zaloVerifyBox').style.display = 'block';
-                startTimer();
-            } else {
-                alert(res.message || "Không tìm thấy hồ sơ phù hợp!");
-            }
-        } catch (e) {
-            // Demo Mode
+    // Hiệu ứng chờ
+    const btnText = document.getElementById("btnText");
+    const spinner = document.getElementById("spinner");
+    if (btnText) btnText.style.display = "none";
+    if (spinner) spinner.style.display = "block";
+
+    try {
+        // 3. Gọi API động dựa trên Action của từng Tab
+        const apiUrl = `http://192.168.1.237:8009/api/EmrWebsite/GetDataByAction?Action=${config.action}&FreePara=${paramValue}`;
+        
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Lỗi kết nối");
+        
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+            const patient = data[0];
+            console.log(`Dữ liệu ${currentTab}:`, patient);
+
+            // TẠM THỜI: Nhảy thẳng đến hiển thị kết quả để bạn test dữ liệu SQL
+            renderResult(patient);
+            
+            // SAU NÀY: Khi chạy thật, bạn hãy mở lại đoạn Zalo OTP dưới đây:
+            /*
+            window.currentPatientData = patient;
+            document.getElementById('maskedPhone').innerText = maskPhone(patient.SDT || "0905641422");
             document.getElementById('zaloVerifyBox').style.display = 'block';
             startTimer();
-        } finally {
-            document.getElementById("btnText").style.display = "inline";
-            document.getElementById("spinner").style.display = "none";
+            */
+
+        } else {
+            alert(`Không tìm thấy dữ liệu trong danh mục ${config.title}`);
         }
+    } catch (error) {
+        console.error("Lỗi:", error);
+        alert("Lỗi kết nối đến máy chủ 192.168.1.237. Vui lòng kiểm tra lại mạng nội bộ.");
+    } finally {
+        if (btnText) btnText.style.display = "inline";
+        if (spinner) spinner.style.display = "none";
     }
+}
 
     // BƯỚC 2: XÁC NHẬN OTP & XỬ LÝ BẢO MẬT
     async function confirmOtpStep2() {
@@ -474,8 +505,8 @@
             // Demo: mã đúng là 123456
             if(otp === "123456") {
                 renderResult({
-                    name: "TRẦN PHI HỮU", dob: "02/02/1999", bhxh: "6020195212",
-                    diagnose: "Bệnh mạch máu não xác định khác: I67.8",
+                    HO_TEN: "TRẦN PHI HỮU", NGAY_SINH: "02/02/1999", MA_BHXH: "6020195212",
+                    CHANDOAN_DIEUTRI: "Bệnh mạch máu não xác định khác: I67.8",
                     days: 1, from: "03/03/2026", to: "03/03/2026", pdf_url: "#"
                 });
                 document.getElementById('zaloVerifyBox').style.display = 'none';
@@ -511,30 +542,58 @@
     }
 
     function renderResult(p) {
-        const resultDiv = document.getElementById("result");
-        resultDiv.innerHTML = `
-            <div style="text-align:center; color: var(--primary-color); margin-bottom: 20px;">
+    const resultDiv = document.getElementById("result");
+    if (!resultDiv) return;
+
+    let detailHtml = "";
+
+    // Tùy biến hiển thị dựa trên Tab đang chọn
+    switch(currentTab) {
+        case 'BHXH':
+            detailHtml = `
+                <p>Số Seri: <strong>${p.MA_CT || p.MA_SERI || '---'}</strong></p>
+                <p>Chẩn đoán: <strong>${p.CHANDOAN_DIEUTRI}</strong></p>
+                <p>Thời gian nghỉ: <strong>${p.TU_NGAY}</strong> đến <strong>${p.DEN_NGAY}</strong></p>`;
+            break;
+        case 'RAVIEN':
+            detailHtml = `
+                <p>Mã y tế: <strong>${p.MA_YTE || '---'}</strong></p>
+                <p>Chẩn đoán: <strong>${p.CHAN_DOAN}</strong></p>
+                <p>Ngày vào viện: <strong>${p.NGAY_VAO}</strong> - Ngày ra: <strong>${p.NGAY_RA}</strong></p>
+                <p>Cách giải quyết: <strong>${p.PP_DIEUTRI || 'Cho về'}</strong></p>`;
+            break;
+        case 'CHUNGSINH':
+            detailHtml = `
+                <p>Số chứng sinh: <strong>${p.SO_CS}</strong></p>
+                <p>Tên con: <strong>${p.TEN_CON || 'Chưa đặt tên'}</strong></p>
+                <p>Cân nặng: <strong>${p.CAN_NANG} gr</strong></p>`;
+            break;
+        default:
+            detailHtml = `<p>Thông tin: <strong>${p.CHANDOAN_DIEUTRI || p.NOI_DUNG || 'Đã xác thực'}</strong></p>`;
+    }
+
+    resultDiv.innerHTML = `
+        <div style="border: 2px solid var(--primary-color); border-radius: 12px; padding: 20px; background: #fff;">
+            <div style="text-align:center; color: var(--primary-color); margin-bottom: 15px;">
                 <i class="fa-solid fa-circle-check fa-2x"></i>
                 <h3>XÁC THỰC THÀNH CÔNG</h3>
+                <p style="color:#666">${TAB_CONFIGS[currentTab].title}</p>
             </div>
-            <span class="result-section-title">I. Thông tin người bệnh</span>
-            <div class="result-row">
-                <span>Họ và tên: <strong>${p.name}</strong></span>
-                <span style="margin-left:auto">Ngày sinh: <strong>${p.dob}</strong></span>
+            <div style="background: #f4f4f4; padding: 15px; border-radius: 8px;">
+                <p>Họ tên: <strong style="color:red; font-size:1.1rem">${p.HO_TEN}</strong></p>
+                <p>Ngày sinh: <strong>${p.NGAY_SINH}</strong></p>
+                ${detailHtml}
             </div>
-            <p>Mã số BHXH: <strong>${p.bhxh}</strong></p>
-            <span class="result-section-title">II. Chẩn đoán và điều trị</span>
-            <p>Chẩn đoán: <strong>${p.diagnose}</strong></p>
-            <p>Số ngày nghỉ: <strong>${p.days}</strong> (Từ ${p.from} đến ${p.to})</p>
-            <div class="pdf-btn-container">
-                <a href="${p.pdf_url}" target="_blank" class="btn-download">
-                    <i class="fa-solid fa-file-pdf"></i> XEM FILE PDF ĐÃ KÝ SỐ
+            <div style="margin-top:20px; text-align:center;">
+                <a href="${p.FileSigned || p.FILE_URL || '#'}" target="_blank" class="btn-download" style="width:100%; justify-content:center">
+                    <i class="fa-solid fa-file-pdf"></i> XEM BẢN GỐC CÓ CHỮ KÝ SỐ
                 </a>
             </div>
-        `;
-        resultDiv.style.display = "block";
-        resultDiv.scrollIntoView({ behavior: 'smooth' });
-    }
+        </div>
+    `;
+    resultDiv.style.display = "block";
+    resultDiv.scrollIntoView({ behavior: 'smooth' });
+}
 
     function openModal() { document.getElementById("guideModal").style.display = "block"; }
     function closeModal() { document.getElementById("guideModal").style.display = "none"; }
